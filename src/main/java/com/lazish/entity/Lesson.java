@@ -2,19 +2,20 @@ package com.lazish.entity;
 
 import com.lazish.base.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
+@Table(name = "Lesson")
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Lesson extends BaseEntity {
     @Id
     @UuidGenerator
@@ -27,4 +28,19 @@ public class Lesson extends BaseEntity {
 
     @Column(name = "reward", nullable = false)
     private int reward;
+
+    @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<UserLesson> userLessons = new HashSet<>();
+
+    @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Translate> translateExercises = new HashSet<>();
+
+    @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Speaking> speakingExercises = new HashSet<>();
+
+    @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Listening> listeningExercises = new HashSet<>();
+
+    @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Matching> matchingExercises = new HashSet<>();
 }
