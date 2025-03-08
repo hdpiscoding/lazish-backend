@@ -3,10 +3,16 @@ package com.lazish.entity;
 import com.lazish.base.BaseEntity;
 import com.lazish.key.UserTopicId;
 import jakarta.persistence.*;
+import lombok.*;
 
 
 @Entity
 @Table(name = "UserTopic")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserTopic extends BaseEntity {
     @EmbeddedId
     private UserTopicId id;
