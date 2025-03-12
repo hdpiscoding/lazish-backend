@@ -44,9 +44,6 @@ public class User extends BaseEntity {
     @Column(name = "avatar", nullable = true)
     private String avatar;
 
-    @Column(name = "streak")
-    private int streak = 0;
-
     @Column(name = "diamond")
     private long diamond = 0;
 
