@@ -3,6 +3,8 @@ package com.lazish.entity;
 import com.lazish.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.UUID;
@@ -22,6 +24,7 @@ public class Speaking extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lesson")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Lesson lesson;
 
     @Column(name = "question", nullable = false)

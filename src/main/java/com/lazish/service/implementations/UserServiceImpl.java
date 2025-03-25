@@ -1,5 +1,6 @@
 package com.lazish.service.implementations;
 
+import com.lazish.dto.UserDTO;
 import com.lazish.entity.User;
 import com.lazish.repository.UserRepository;
 import com.lazish.service.interfaces.UserService;
@@ -25,20 +26,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
-    public User createUser(User user) {
-        logger.info("Creating user: {}", user);
-        return userRepository.save(user);
-    }
-
-    @Override
     public User getUserById(UUID id) {
         return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found!"));
     }
 
     @Override
     @Transactional
-    public User updateUser(UUID id, User user) {
+    public User updateUserInfo(UUID id, UserDTO user) {
         logger.info("Updating user with id: {}", id);
         User temp_user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found!"));
 
@@ -47,6 +41,7 @@ public class UserServiceImpl implements UserService {
         temp_user.setPhone(user.getPhone());
         temp_user.setAge(user.getAge());
         temp_user.setDob(user.getDob());
+        temp_user.setAvatar(user.getAvatar());
 
         return userRepository.save(temp_user);
     }
@@ -68,5 +63,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public int getUserStreak(UUID userId) {
         return 0;
+    }
+
+    @Override
+    public long getUserDiamonds(UUID userId) {
+        return userRepository.getUserDiamonds(userId);
     }
 }

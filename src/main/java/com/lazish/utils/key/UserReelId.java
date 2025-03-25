@@ -1,7 +1,6 @@
-package com.lazish.key;
+package com.lazish.utils.key;
 
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.Embedded;
 import lombok.*;
 
 import java.io.Serializable;
@@ -10,10 +9,10 @@ import java.util.UUID;
 @Embeddable
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode
-public class UserTopicId implements Serializable {
+public class UserReelId implements Serializable {
     private UUID userId;
-    private UUID topicId;
+    private UUID reelId;
 }

@@ -31,9 +31,9 @@ public class Topic extends BaseEntity {
     @Column(name = "total_lessons")
     private int total_lessons;
 
-    @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Lesson> lessons =  new HashSet<>();
 
-    @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserTopic> userTopics = new HashSet<>();
 }

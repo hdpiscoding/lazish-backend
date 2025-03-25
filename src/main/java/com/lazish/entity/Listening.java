@@ -4,6 +4,8 @@ import com.lazish.base.BaseEntity;
 import com.lazish.utils.converter.ListStringToJsonConverter;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.List;
@@ -24,6 +26,7 @@ public class Listening extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lesson")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Lesson lesson;
 
     @Column(name = "audio", nullable = false)

@@ -5,6 +5,8 @@ import com.lazish.utils.converter.ListMapToJsonConverter;
 import com.lazish.utils.converter.ListStringToJsonConverter;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.List;
@@ -25,6 +27,7 @@ public class Translate extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lesson")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Lesson lesson;
 
     @Column(name = "question", nullable = false)
