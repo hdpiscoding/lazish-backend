@@ -1,6 +1,7 @@
 package com.lazish.security;
 
 import com.lazish.repository.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,10 +13,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -39,28 +36,42 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/reels").permitAll()
 
                         // User APIs
-                        .requestMatchers("/api/v1/users/me/**").authenticated()
-                        .requestMatchers("/api/v1/rank").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/topics").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/reels/{id}").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/me").hasAuthority("USER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/me").hasAuthority("USER")
+                        .requestMatchers("/api/v1/users/me/**").hasAuthority("USER")
+                        .requestMatchers("/api/v1/rank").hasAuthority("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/topics").hasAuthority("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/reels/{id}").hasAuthority("USER")
 
                         // Admin APIs
-                        .requestMatchers(HttpMethod.GET, "/api/v1/users/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/users/{id}/analysis").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/lessons").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/lessons/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/lessons/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/topics").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/topics/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/topics/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/reels").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/reels/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/reels/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/{id}").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/{id}/analysis").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/lessons").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/lessons/{id}").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/lessons/{id}").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/topics").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/topics/{id}").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/topics/{id}").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/reels").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/reels/{id}").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/reels/{id}").hasAuthority("ADMIN")
 
                         // default APIs
                         .anyRequest().authenticated()
                 )
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"status\":401, \"error\":\"Unauthorized\", \"message\":\"You need to login first\", \"path\":\"" + request.getRequestURI() + "\"}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"status\":403, \"error\":\"Forbidden\", \"message\":\"Access denied\", \"path\":\"" + request.getRequestURI() + "\"}");
+                        })
+                )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(Customizer.withDefaults())

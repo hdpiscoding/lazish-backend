@@ -2,7 +2,9 @@ package com.lazish.controller;
 
 import com.lazish.base.BaseController;
 import com.lazish.entity.User;
-import com.lazish.service.interfaces.UserService;
+import com.lazish.service.implementations.JwtServiceImpl;
+import com.lazish.service.implementations.UserServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,29 +15,28 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/users")
+@RequiredArgsConstructor(onConstructor_ = {@Autowired})
 public class UserController extends BaseController {
-    private final UserService userService;
+    private final UserServiceImpl userService;
+    private final JwtServiceImpl jwtServiceImpl;
 
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Object> getAllUsers() {
         return buildResponse(userService.getAllUsers(), HttpStatus.OK, "Get all users successfully");
     }
 
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_USER')")
-    public ResponseEntity<Object> getUserById(@PathVariable UUID id) {
-        return buildResponse(userService.getUserById(id), HttpStatus.OK, "Get user successfully");
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping("/me")
+    public ResponseEntity<Object> getUserById(@RequestHeader("Authorization") String authHeader) {
+        UUID userId = jwtServiceImpl.extractUserId(authHeader.substring(7));
+        return buildResponse(userService.getUserById(userId), HttpStatus.OK, "Get user successfully");
     }
 
-    @GetMapping("/{id}/diamonds")
-    @PreAuthorize("hasAuthority('ROLE_USER')")
-    public ResponseEntity<Object> getUserDiamonds(@PathVariable UUID id) {
-        return buildResponse(userService.getUserDiamonds(id), HttpStatus.OK, "Get user diamonds successfully");
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping("/me/diamonds")
+    public ResponseEntity<Object> getUserDiamonds(@RequestHeader("Authorization") String authHeader) {
+        UUID userId = jwtServiceImpl.extractUserId(authHeader.substring(7));
+        return buildResponse(userService.getUserDiamonds(userId), HttpStatus.OK, "Get user diamonds successfully");
     }
 }
