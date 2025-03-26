@@ -2,6 +2,7 @@ package com.lazish.service.implementations;
 
 import com.lazish.dto.UserDTO;
 import com.lazish.entity.User;
+import com.lazish.mapper.UserMapper;
 import com.lazish.repository.UserRepository;
 import com.lazish.service.interfaces.UserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -19,15 +20,18 @@ public class UserServiceImpl implements UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
+
     @Override
-    public User getUserById(UUID id) {
-        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found!"));
+    public UserDTO getUserById(UUID id) {
+        return userMapper.toDto(userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found!")));
     }
 
     @Override

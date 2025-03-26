@@ -1,6 +1,8 @@
 package com.lazish.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lazish.service.implementations.JwtServiceImpl;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -35,16 +39,31 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        token = authHeader.substring(7);
-        email = jwtService.extractEmail(token);
+        try{
+            token = authHeader.substring(7);
+            email = jwtService.extractEmail(token);
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authToken);
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+
+            filterChain.doFilter(request, response);
         }
+        catch (ExpiredJwtException e){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
 
-        filterChain.doFilter(request, response);
+            Map<String, Object> errorDetails = new HashMap<>();
+            errorDetails.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+            errorDetails.put("error", "Unauthorized");
+            errorDetails.put("message", "Token has expired");
+            errorDetails.put("path", request.getRequestURI());
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            response.getWriter().write(objectMapper.writeValueAsString(errorDetails));
+        }
     }
 }

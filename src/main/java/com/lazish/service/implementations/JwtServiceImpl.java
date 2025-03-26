@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class JwtServiceImpl implements JwtService {
@@ -21,11 +24,15 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String generateToken(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", user.getId());
+        claims.put("role", user.getRole());
         return Jwts
                 .builder()
+                .setClaims(claims)
                 .setSubject(user.getEmail())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30)) // 30 minutes
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -46,6 +53,47 @@ public class JwtServiceImpl implements JwtService {
         return null;
     }
 
+    @Override
+    public UUID extractUserId(String token) {
+        Claims claims = extractAllClaims(token);
+        if (claims != null) {
+            Date expiration = claims.getExpiration();
+            boolean isExpired = expiration.before(Date.from(Instant.now()));
+            if (!isExpired) {
+                return UUID.fromString(claims.get("userId", String.class));
+            }
+            else {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public String extractRole(String token) {
+        Claims claims = extractAllClaims(token);
+        if (claims != null) {
+            Date expiration = claims.getExpiration();
+            boolean isExpired = expiration.before(Date.from(Instant.now()));
+            if (!isExpired) {
+                return claims.get("role", String.class);
+            }
+            else {
+                return null;
+            }
+        }
+        return null;       }
+
+    @Override
+    public boolean isTokenExpired(String token) {
+        Claims claims = extractAllClaims(token);
+        if (claims != null) {
+            Date expiration = claims.getExpiration();
+            return expiration.before(Date.from(Instant.now()));
+        }
+        return true;
+    }
+
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -56,5 +104,6 @@ public class JwtServiceImpl implements JwtService {
 
     private Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);    }
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 }
