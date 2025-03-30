@@ -33,12 +33,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public APIs
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/reels").permitAll()
 
                         // User APIs
-                        .requestMatchers(HttpMethod.GET, "/api/v1/users/me").hasAuthority("USER")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/me").hasAuthority("USER")
-                        .requestMatchers("/api/v1/users/me/**").hasAuthority("USER")
+                        .requestMatchers("/api/v1/users/me/**").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers("/api/v1/rank").hasAuthority("USER")
                         .requestMatchers(HttpMethod.GET, "/api/v1/topics").hasAuthority("USER")
                         .requestMatchers(HttpMethod.GET, "/api/v1/reels/{id}").hasAuthority("USER")

@@ -9,6 +9,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +22,13 @@ public class UserServiceImpl implements UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -36,18 +39,36 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User updateUserInfo(UUID id, UserDTO user) {
+    public UserDTO updateUserInfo(UUID id, UserDTO user) {
         logger.info("Updating user with id: {}", id);
         User temp_user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found!"));
 
-        temp_user.setFullname(user.getFullname());
-        temp_user.setEmail(user.getEmail());
-        temp_user.setPhone(user.getPhone());
-        temp_user.setAge(user.getAge());
-        temp_user.setDob(user.getDob());
-        temp_user.setAvatar(user.getAvatar());
+        if(user.getFullname() != null) {
+            temp_user.setFullname(user.getFullname());
+        }
+        if(user.getPhone() != null) {
+            temp_user.setPhone(user.getPhone());
+        }
+        if(user.getAge() != 0) {
+            temp_user.setAge(user.getAge());
+        }
+        if(user.getDob() != null) {
+            temp_user.setDob(user.getDob());
+        }
+        if(user.getAvatar() != null) {
+            temp_user.setAvatar(user.getAvatar());
+        }
 
-        return userRepository.save(temp_user);
+        return userMapper.toDto(userRepository.save(temp_user));
+    }
+
+    @Override
+    public void changePassword(UUID id, String newPassword) {
+        logger.info("Changing password for user with id: {}", id);
+        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found!"));
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        userRepository.save(user);
     }
 
     @Override
@@ -60,8 +81,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserDTO> getAllUsers() {
+        return userMapper.toDtoList(userRepository.findAll());
     }
 
     @Override
