@@ -32,12 +32,12 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         // Public APIs
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
 
                         // User APIs
                         .requestMatchers("/api/v1/users/me/**").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers("/api/v1/rank").hasAuthority("USER")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/topics").hasAuthority("USER")
                         .requestMatchers(HttpMethod.GET, "/api/v1/reels/{id}").hasAuthority("USER")
 
                         // Admin APIs

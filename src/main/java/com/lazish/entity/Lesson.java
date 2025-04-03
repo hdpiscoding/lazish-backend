@@ -36,14 +36,5 @@ public class Lesson extends BaseEntity {
     private Set<UserLesson> userLessons = new HashSet<>();
 
     @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Translate> translateExercises = new HashSet<>();
-
-    @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Speaking> speakingExercises = new HashSet<>();
-
-    @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Listening> listeningExercises = new HashSet<>();
-
-    @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Matching> matchingExercises = new HashSet<>();
+    private Set<Exercise> exercises = new HashSet<>();
 }
