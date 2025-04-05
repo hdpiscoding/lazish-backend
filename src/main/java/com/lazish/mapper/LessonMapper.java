@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -35,5 +36,15 @@ public class LessonMapper implements BaseMapper<Lesson, LessonDTO> {
     @Override
     public List<Lesson> toEntityList(List<LessonDTO> dtos) {
         return dtos.stream().map(this::toEntity).collect(Collectors.toList());
+    }
+
+    @Override
+    public Set<LessonDTO> toDtoSet(Set<Lesson> entities) {
+        return entities.stream().map(this::toDto).collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<Lesson> toEntitySet(Set<LessonDTO> dtos) {
+        return dtos.stream().map(this::toEntity).collect(Collectors.toSet());
     }
 }

@@ -11,4 +11,5 @@ public interface ExerciseService {
     Exercise createExercise(ExerciseDTO exerciseDTO, Lesson lesson);
     ExerciseDTO updateExercise(UUID id, ExerciseDTO exerciseDTO);
     void deleteExercise(UUID id);
+    ExerciseDTO addExerciseToLesson(ExerciseDTO exerciseDTO, UUID lessonId);
 }

@@ -9,7 +9,8 @@ import java.util.UUID;
 
 public interface LessonService {
     Lesson createLesson(LessonDTO lessonDTO, Topic topic);
-    LessonDTO updateLesson(LessonDTO lessonDTO);
+    LessonDTO updateLesson(UUID id, LessonDTO lessonDTO);
+    LessonDTO addLessonToTopic(LessonDTO lessonDTO, UUID topicId);
     void deleteLesson(UUID id);
     LessonDTO getLesson(UUID id);
 }

@@ -4,12 +4,15 @@ import com.lazish.dto.ExerciseDTO;
 import com.lazish.entity.Exercise;
 import com.lazish.entity.Lesson;
 import com.lazish.mapper.ExerciseMapper;
+import com.lazish.mapper.LessonMapper;
 import com.lazish.repository.ExerciseRepository;
+import com.lazish.repository.LessonRepository;
 import com.lazish.service.interfaces.ExerciseService;
 import com.lazish.utils.enums.ExerciseType;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +23,10 @@ import java.util.UUID;
 public class ExerciseServiceImpl implements ExerciseService {
     private final ExerciseRepository exerciseRepository;
     private final ExerciseMapper exerciseMapper;
+    private final LessonRepository lessonRepository;
+    private final LessonMapper lessonMapper;
+    private final ApplicationContext applicationContext;
+
 
     @Override
     @Transactional
@@ -119,5 +126,16 @@ public class ExerciseServiceImpl implements ExerciseService {
     @Transactional
     public void deleteExercise(UUID id) {
         exerciseRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public ExerciseDTO addExerciseToLesson(ExerciseDTO exerciseDTO, UUID lessonId) {
+        Lesson lesson = lessonRepository.findById(lessonId).orElseThrow(() -> new EntityNotFoundException("Lesson not found!"));
+
+        // Make sure @Transactional works correctly
+        ExerciseServiceImpl self = applicationContext.getBean(ExerciseServiceImpl.class);
+        Exercise exercise = self.createExercise(exerciseDTO, lesson);
+        return exerciseMapper.toDto(exercise);
     }
 }

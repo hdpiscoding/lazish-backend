@@ -1,7 +1,9 @@
 package com.lazish.controller;
 
 import com.lazish.base.BaseController;
+import com.lazish.dto.LessonDTO;
 import com.lazish.dto.TopicDTO;
+import com.lazish.service.implementations.LessonServiceImpl;
 import com.lazish.service.implementations.TopicServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 public class TopicController extends BaseController {
     private final TopicServiceImpl topicService;
+    private final LessonServiceImpl lessonService;
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("")
@@ -45,5 +48,11 @@ public class TopicController extends BaseController {
     public ResponseEntity<Object> deleteTopic(@PathVariable UUID id) {
         topicService.deleteTopic(id);
         return buildResponse(null, HttpStatus.OK, "Delete topic successfully");
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/{id}/lessons")
+    public ResponseEntity<Object> addLessonsToTopic(@PathVariable UUID id, @RequestBody LessonDTO lesson) {
+        return buildResponse(lessonService.addLessonToTopic(lesson, id), HttpStatus.CREATED, "Add lessons to topic successfully");
     }
 }

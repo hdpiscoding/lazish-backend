@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -35,5 +36,15 @@ public class ExerciseMapper implements BaseMapper<Exercise, ExerciseDTO> {
     @Override
     public List<Exercise> toEntityList(List<ExerciseDTO> dtos) {
         return dtos.stream().map(this::toEntity).collect(Collectors.toList());
+    }
+
+    @Override
+    public Set<ExerciseDTO> toDtoSet(Set<Exercise> entities) {
+        return entities.stream().map(this::toDto).collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<Exercise> toEntitySet(Set<ExerciseDTO> dtos) {
+        return dtos.stream().map(this::toEntity).collect(Collectors.toSet());
     }
 }
