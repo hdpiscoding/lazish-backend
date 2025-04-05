@@ -13,6 +13,7 @@ import java.util.UUID;
 @Table(name = "Topic")
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -29,7 +30,7 @@ public class Topic extends BaseEntity {
     private String image;
 
     @Column(name = "total_lessons")
-    private int total_lessons;
+    private int totalLessons;
 
     @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Lesson> lessons =  new HashSet<>();

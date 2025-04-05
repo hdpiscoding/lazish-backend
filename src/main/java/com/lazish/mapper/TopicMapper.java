@@ -1,8 +1,8 @@
 package com.lazish.mapper;
 
 import com.lazish.base.BaseMapper;
-import com.lazish.dto.UserDTO;
-import com.lazish.entity.User;
+import com.lazish.dto.TopicDTO;
+import com.lazish.entity.Topic;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,36 +14,36 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
-public class UserMapper implements BaseMapper<User, UserDTO> {
+public class TopicMapper implements BaseMapper<Topic, TopicDTO> {
     private final ModelMapper modelMapper;
 
     @Override
-    public UserDTO toDto(User entity) {
-        return modelMapper.map(entity, UserDTO.class);
+    public TopicDTO toDto(Topic entity) {
+        return modelMapper.map(entity, TopicDTO.class);
     }
 
     @Override
-    public User toEntity(UserDTO dto) {
-        return modelMapper.map(dto, User.class);
+    public Topic toEntity(TopicDTO dto) {
+        return modelMapper.map(dto, Topic.class);
     }
 
     @Override
-    public List<UserDTO> toDtoList(List<User> entities) {
-        return entities.stream().map(this::toDto).toList();
+    public List<TopicDTO> toDtoList(List<Topic> entities) {
+        return entities.stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<User> toEntityList(List<UserDTO> dtos) {
-        return dtos.stream().map(this::toEntity).toList();
+    public List<Topic> toEntityList(List<TopicDTO> dtos) {
+        return dtos.stream().map(this::toEntity).collect(Collectors.toList());
     }
 
     @Override
-    public Set<UserDTO> toDtoSet(Set<User> entities) {
+    public Set<TopicDTO> toDtoSet(Set<Topic> entities) {
         return entities.stream().map(this::toDto).collect(Collectors.toSet());
     }
 
     @Override
-    public Set<User> toEntitySet(Set<UserDTO> dtos) {
+    public Set<Topic> toEntitySet(Set<TopicDTO> dtos) {
         return dtos.stream().map(this::toEntity).collect(Collectors.toSet());
     }
 }

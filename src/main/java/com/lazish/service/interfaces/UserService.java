@@ -8,9 +8,10 @@ import java.util.UUID;
 
 public interface UserService {
     UserDTO getUserById(UUID id);
-    User updateUserInfo(UUID id, UserDTO user);
+    UserDTO updateUserInfo(UUID id, UserDTO user);
+    void changePassword(UUID id, String newPassword);
     void deleteUser(UUID id);
-    List<User> getAllUsers();
+    List<UserDTO> getAllUsers();
     int getUserStreak(UUID userId);
     long getUserDiamonds(UUID userId);
 }

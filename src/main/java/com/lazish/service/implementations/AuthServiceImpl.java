@@ -13,6 +13,7 @@ import com.lazish.service.interfaces.AuthService;
 import com.lazish.utils.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,16 +37,9 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFullname(request.getFullname());
         user.setAge(request.getAge());
-        user.setRole(Role.ADMIN);
+        user.setRole(Role.USER);
         User newUser = userRepository.save(user);
         String token = jwtServiceImpl.generateToken(newUser);
-        tokenRepository.save(Token
-                .builder()
-                .user(newUser)
-                .token(token)
-                .expired(false)
-                .revoked(false)
-                .build());
         return AuthResponseDTO
                 .builder()
                 .user(userMapper.toDto(newUser))
@@ -63,13 +57,6 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         String token = jwtServiceImpl.generateToken(user);
-        tokenRepository.save(Token
-                .builder()
-                .user(user)
-                .token(token)
-                .expired(false)
-                .revoked(false)
-                .build());
         UserDTO userDTO = userMapper.toDto(user);
         return AuthResponseDTO
                 .builder()
@@ -77,4 +64,11 @@ public class AuthServiceImpl implements AuthService {
                 .token(token)
                 .build();
     }
+
+    @Override
+    public void forgotPassword(String newPassword) {
+        return;
+    }
+
+
 }
