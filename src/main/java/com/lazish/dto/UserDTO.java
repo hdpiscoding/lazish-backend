@@ -1,5 +1,6 @@
 package com.lazish.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.lazish.utils.enums.Role;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -9,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -26,4 +28,7 @@ public class UserDTO {
     private Date dob;
     private String avatar;
     private long diamond = 0;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Set<ReelDTO> reels;
 }

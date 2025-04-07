@@ -1,14 +1,15 @@
 package com.lazish.service.implementations;
 
 import com.lazish.dto.LessonDTO;
-import com.lazish.entity.Exercise;
-import com.lazish.entity.Lesson;
-import com.lazish.entity.Topic;
+import com.lazish.entity.*;
 import com.lazish.mapper.ExerciseMapper;
 import com.lazish.mapper.LessonMapper;
 import com.lazish.repository.LessonRepository;
 import com.lazish.repository.TopicRepository;
+import com.lazish.repository.UserLessonRepository;
 import com.lazish.service.interfaces.LessonService;
+import com.lazish.utils.key.UserLessonId;
+import com.lazish.utils.key.UserTopicId;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -28,7 +29,8 @@ public class LessonServiceImpl implements LessonService {
     private final LessonRepository lessonRepository;
     private final TopicRepository topicRepository;
     private final LessonMapper lessonMapper;
-    private final ExerciseMapper exerciseMapper;
+    private final TopicServiceImpl topicService;
+    private final UserLessonRepository userLessonRepository;
     private final Logger logger = LoggerFactory.getLogger(LessonServiceImpl.class);
 
     @Override
@@ -94,5 +96,32 @@ public class LessonServiceImpl implements LessonService {
     public LessonDTO getLesson(UUID id) {
         Lesson lesson = lessonRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Lesson not found!"));
         return lessonMapper.toDto(lesson);
+    }
+
+    @Override
+    @Transactional
+    public void finishUserLesson(UUID userId, UUID lessonId) {
+        if (userLessonRepository.existsById(new UserLessonId(userId, lessonId))) {
+            if (userLessonRepository.getUserProgress(userId, lessonId) < 100) {
+                UserLesson userLesson = userLessonRepository.findById(new UserLessonId(userId, lessonId)).orElseThrow(() -> new EntityNotFoundException("User lesson not found!"));
+                userLesson.setProgress(100);
+                userLessonRepository.save(userLesson);
+                topicService.finishUserTopic(userId, lessonId);
+            }
+        }
+        else{
+            UserLesson userLesson = UserLesson
+                    .builder()
+                    .id(new UserLessonId(userId, lessonId))
+                    .progress(100)
+                    .build();
+            userLessonRepository.save(userLesson);
+            topicService.finishUserTopic(userId, lessonId);
+        }
+    }
+
+    @Override
+    public int getUserProgress(UUID userId, UUID lessonId) {
+        return userLessonRepository.getUserProgress(userId, lessonId);
     }
 }

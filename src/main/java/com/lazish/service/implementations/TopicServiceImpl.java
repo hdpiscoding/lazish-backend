@@ -5,8 +5,11 @@ import com.lazish.dto.TopicDTO;
 import com.lazish.entity.Lesson;
 import com.lazish.entity.Topic;
 import com.lazish.mapper.TopicMapper;
+import com.lazish.repository.LessonRepository;
 import com.lazish.repository.TopicRepository;
+import com.lazish.repository.UserLessonRepository;
 import com.lazish.service.interfaces.TopicService;
+import com.lazish.utils.key.UserLessonId;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -24,6 +27,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 public class TopicServiceImpl implements TopicService {
     private final TopicRepository topicRepository;
+    private final LessonRepository lessonRepository;
+    private final UserLessonRepository userLessonRepository;
     private final TopicMapper topicMapper;
     private final LessonServiceImpl lessonService;
     private final ObjectMapper objectMapper;
@@ -82,5 +87,13 @@ public class TopicServiceImpl implements TopicService {
     @Transactional
     public void deleteTopic(UUID id) {
         topicRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public void finishUserTopic(UUID userId, UUID lessonId) {
+        Topic topic = lessonRepository.getTopicByLessonId(lessonId);
+        topic.setTotalLessons(topic.getTotalLessons() + 1);
+        topicRepository.save(topic);
     }
 }
