@@ -2,6 +2,7 @@ package com.lazish.entity;
 
 import com.lazish.base.BaseEntity;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.HashSet;
@@ -10,6 +11,11 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "Reel")
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Reel extends BaseEntity {
     @Id
     @UuidGenerator

@@ -1,8 +1,8 @@
 package com.lazish.mapper;
 
 import com.lazish.base.BaseMapper;
-import com.lazish.dto.LessonDTO;
-import com.lazish.entity.Lesson;
+import com.lazish.dto.ReelDTO;
+import com.lazish.entity.Reel;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,36 +14,36 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
-public class LessonMapper implements BaseMapper<Lesson, LessonDTO> {
+public class ReelMapper implements BaseMapper<Reel, ReelDTO> {
     private final ModelMapper modelMapper;
 
     @Override
-    public LessonDTO toDto(Lesson entity) {
-        return modelMapper.map(entity, LessonDTO.class);
+    public ReelDTO toDto(Reel entity) {
+        return modelMapper.map(entity, ReelDTO.class);
     }
 
     @Override
-    public Lesson toEntity(LessonDTO dto) {
-        return modelMapper.map(dto, Lesson.class);
+    public Reel toEntity(ReelDTO dto) {
+        return modelMapper.map(dto, Reel.class);
     }
 
     @Override
-    public List<LessonDTO> toDtoList(List<Lesson> entities) {
+    public List<ReelDTO> toDtoList(List<Reel> entities) {
         return entities.stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<Lesson> toEntityList(List<LessonDTO> dtos) {
+    public List<Reel> toEntityList(List<ReelDTO> dtos) {
         return dtos.stream().map(this::toEntity).collect(Collectors.toList());
     }
 
     @Override
-    public Set<LessonDTO> toDtoSet(Set<Lesson> entities) {
+    public Set<ReelDTO> toDtoSet(Set<Reel> entities) {
         return entities.stream().map(this::toDto).collect(Collectors.toSet());
     }
 
     @Override
-    public Set<Lesson> toEntitySet(Set<LessonDTO> dtos) {
+    public Set<Reel> toEntitySet(Set<ReelDTO> dtos) {
         return dtos.stream().map(this::toEntity).collect(Collectors.toSet());
     }
 }

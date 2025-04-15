@@ -13,8 +13,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -34,7 +36,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getUserById(UUID id) {
-        return userMapper.toDto(userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found!")));
+        User u = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found!"));
+        u.setReels(null);
+        return userMapper.toDto(u);
     }
 
     @Override
@@ -59,7 +63,10 @@ public class UserServiceImpl implements UserService {
             temp_user.setAvatar(user.getAvatar());
         }
 
-        return userMapper.toDto(userRepository.save(temp_user));
+        User u = userRepository.save(temp_user);
+        u.setReels(null);
+
+        return userMapper.toDto(u);
     }
 
     @Override
@@ -82,7 +89,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDTO> getAllUsers() {
-        return userMapper.toDtoList(userRepository.findAll());
+        List<User> users = userRepository.findAll()
+                .stream()
+                .peek(user -> user.setReels(null))
+                .toList();
+        return userMapper.toDtoList(users);
     }
 
     @Override

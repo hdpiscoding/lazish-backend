@@ -4,7 +4,7 @@ import com.lazish.base.BaseController;
 import com.lazish.dto.AuthResponseDTO;
 import com.lazish.dto.LoginDTO;
 import com.lazish.dto.RegisterDTO;
-import com.lazish.service.implementations.AuthServiceImpl;
+import com.lazish.service.interfaces.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController extends BaseController {
-    private final AuthServiceImpl authService;
+    private final AuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<Object> register(@RequestBody RegisterDTO request) {

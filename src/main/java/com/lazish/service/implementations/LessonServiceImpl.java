@@ -1,14 +1,16 @@
 package com.lazish.service.implementations;
 
 import com.lazish.dto.LessonDTO;
-import com.lazish.entity.Exercise;
-import com.lazish.entity.Lesson;
-import com.lazish.entity.Topic;
-import com.lazish.mapper.ExerciseMapper;
+import com.lazish.entity.*;
 import com.lazish.mapper.LessonMapper;
 import com.lazish.repository.LessonRepository;
 import com.lazish.repository.TopicRepository;
+import com.lazish.repository.UserLessonRepository;
+import com.lazish.repository.UserRepository;
+import com.lazish.service.interfaces.ExerciseService;
 import com.lazish.service.interfaces.LessonService;
+import com.lazish.service.interfaces.TopicService;
+import com.lazish.utils.key.UserLessonId;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -24,11 +26,13 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class LessonServiceImpl implements LessonService {
-    private final ExerciseServiceImpl exerciseService;
+    private final ExerciseService exerciseService;
     private final LessonRepository lessonRepository;
     private final TopicRepository topicRepository;
+    private final UserRepository userRepository;
     private final LessonMapper lessonMapper;
-    private final ExerciseMapper exerciseMapper;
+    private final TopicService topicService;
+    private final UserLessonRepository userLessonRepository;
     private final Logger logger = LoggerFactory.getLogger(LessonServiceImpl.class);
 
     @Override
@@ -94,5 +98,46 @@ public class LessonServiceImpl implements LessonService {
     public LessonDTO getLesson(UUID id) {
         Lesson lesson = lessonRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Lesson not found!"));
         return lessonMapper.toDto(lesson);
+    }
+
+    @Override
+    @Transactional
+    public void finishUserLesson(UUID userId, UUID lessonId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found!"));
+        Lesson lesson = lessonRepository.findById(lessonId).orElseThrow(() -> new EntityNotFoundException("Lesson not found!"));
+        if (userLessonRepository.existsById(new UserLessonId(userId, lessonId))) {
+            if (userLessonRepository.getUserProgress(userId, lessonId) < 100) {
+                UserLesson userLesson = userLessonRepository.findById(new UserLessonId(userId, lessonId)).orElseThrow(() -> new EntityNotFoundException("User lesson not found!"));
+                userLesson.setProgress(100);
+                userLessonRepository.save(userLesson);
+                user.setDiamond(user.getDiamond() + lesson.getReward());
+                userRepository.save(user);
+                topicService.finishUserTopic(userId, lessonId);
+            }
+        }
+        else{
+            logger.info("Creating new user lesson with id: {}", lessonId);
+            UserLesson userLesson = UserLesson
+                    .builder()
+                    .id(new UserLessonId(userId, lessonId))
+                    .lesson(lesson)
+                    .user(user)
+                    .progress(100)
+                    .build();
+            userLessonRepository.save(userLesson);
+            user.setDiamond(user.getDiamond() + lesson.getReward());
+            userRepository.save(user);
+            topicService.finishUserTopic(userId, lessonId);
+        }
+    }
+
+    @Override
+    public int getUserProgress(UUID userId, UUID lessonId) {
+        if(userLessonRepository.existsById(new UserLessonId(userId, lessonId))) {
+            return userLessonRepository.getUserProgress(userId, lessonId);
+        }
+        else{
+            return 0;
+        }
     }
 }

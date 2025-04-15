@@ -24,7 +24,6 @@ public class ExerciseServiceImpl implements ExerciseService {
     private final ExerciseRepository exerciseRepository;
     private final ExerciseMapper exerciseMapper;
     private final LessonRepository lessonRepository;
-    private final LessonMapper lessonMapper;
     private final ApplicationContext applicationContext;
 
 
