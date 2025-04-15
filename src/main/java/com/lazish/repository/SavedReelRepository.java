@@ -12,6 +12,6 @@ import java.util.UUID;
 
 @Repository
 public interface SavedReelRepository extends JpaRepository<SavedReel, UserReelId> {
-    @Query("SELECT sr FROM SavedReel sr JOIN Reel WHERE sr.user.id = :userId")
+    @Query("SELECT sr.reel FROM SavedReel sr WHERE sr.user.id = :userId")
     List<Reel> getAllSavedReels(UUID userId);
 }

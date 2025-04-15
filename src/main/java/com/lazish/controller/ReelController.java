@@ -4,8 +4,8 @@ import com.lazish.base.BaseController;
 import com.lazish.dto.ReelDTO;
 import com.lazish.entity.User;
 import com.lazish.repository.UserRepository;
-import com.lazish.service.implementations.JwtServiceImpl;
-import com.lazish.service.implementations.ReelServiceImpl;
+import com.lazish.service.interfaces.JwtService;
+import com.lazish.service.interfaces.ReelService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +20,8 @@ import java.util.UUID;
 @RequestMapping("/api/v1/reels")
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 public class ReelController extends BaseController {
-    private final ReelServiceImpl reelService;
-    private final JwtServiceImpl jwtService;
+    private final ReelService reelService;
+    private final JwtService jwtService;
     private final UserRepository userRepository;
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -57,7 +57,7 @@ public class ReelController extends BaseController {
     }
 
     @PreAuthorize("hasAuthority('USER')")
-    @GetMapping("/saved")
+    @GetMapping("/me/saved")
     public ResponseEntity<Object> getMySavedReels(@RequestHeader("Authorization") String authHeader) {
         UUID userId = jwtService.extractUserId(authHeader.substring(7));
         return buildResponse(reelService.getMySavedReels(userId), HttpStatus.OK, "Get my saved reels successfully");

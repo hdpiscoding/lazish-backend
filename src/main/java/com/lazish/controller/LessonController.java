@@ -3,8 +3,8 @@ package com.lazish.controller;
 import com.lazish.base.BaseController;
 import com.lazish.dto.ExerciseDTO;
 import com.lazish.dto.LessonDTO;
-import com.lazish.service.implementations.ExerciseServiceImpl;
-import com.lazish.service.implementations.JwtServiceImpl;
+import com.lazish.service.interfaces.ExerciseService;
+import com.lazish.service.interfaces.JwtService;
 import com.lazish.service.interfaces.LessonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +21,8 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 public class LessonController extends BaseController {
     private final LessonService lessonService;
-    private final ExerciseServiceImpl exerciseService;
-    private final JwtServiceImpl jwtService;
+    private final ExerciseService exerciseService;
+    private final JwtService jwtService;
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}")

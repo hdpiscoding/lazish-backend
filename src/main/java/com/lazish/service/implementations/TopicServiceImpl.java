@@ -1,20 +1,24 @@
 package com.lazish.service.implementations;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lazish.dto.TopicDTO;
 import com.lazish.entity.Lesson;
 import com.lazish.entity.Topic;
+import com.lazish.entity.User;
+import com.lazish.entity.UserTopic;
 import com.lazish.mapper.TopicMapper;
 import com.lazish.repository.LessonRepository;
 import com.lazish.repository.TopicRepository;
-import com.lazish.repository.UserLessonRepository;
+import com.lazish.repository.UserRepository;
+import com.lazish.repository.UserTopicRepository;
+import com.lazish.service.interfaces.LessonService;
 import com.lazish.service.interfaces.TopicService;
-import com.lazish.utils.key.UserLessonId;
+import com.lazish.utils.key.UserTopicId;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,14 +28,23 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired})
 public class TopicServiceImpl implements TopicService {
     private final TopicRepository topicRepository;
     private final LessonRepository lessonRepository;
-    private final UserLessonRepository userLessonRepository;
     private final TopicMapper topicMapper;
-    private final LessonServiceImpl lessonService;
-    private final ObjectMapper objectMapper;
+    private final LessonService lessonService;
+    private final UserTopicRepository userTopicRepository;
+    private final UserRepository userRepository;
+
+    @Autowired
+    public TopicServiceImpl(TopicRepository topicRepository, TopicMapper topicMapper, @Lazy LessonService lessonService, LessonRepository lessonRepository, UserTopicRepository userTopicRepository, UserRepository userRepository) {
+        this.topicRepository = topicRepository;
+        this.topicMapper = topicMapper;
+        this.lessonService = lessonService;
+        this.lessonRepository = lessonRepository;
+        this.userTopicRepository = userTopicRepository;
+        this.userRepository = userRepository;
+    }
     private static final Logger logger = LoggerFactory.getLogger(TopicServiceImpl.class);
 
     @Override
@@ -92,8 +105,29 @@ public class TopicServiceImpl implements TopicService {
     @Override
     @Transactional
     public void finishUserTopic(UUID userId, UUID lessonId) {
-        Topic topic = lessonRepository.getTopicByLessonId(lessonId);
-        topic.setTotalLessons(topic.getTotalLessons() + 1);
-        topicRepository.save(topic);
+        Lesson lesson = lessonRepository.findById(lessonId).orElseThrow(() -> new EntityNotFoundException("Lesson not found!"));
+        Topic topic = lesson.getTopic();
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found!"));
+        UserTopicId userTopicId = new UserTopicId(userId, topic.getId());
+        if(userTopicRepository.existsById(userTopicId)) {
+            UserTopic userTopic = userTopicRepository.findById(userTopicId).orElseThrow(() -> new EntityNotFoundException("User topic not found!"));
+            if(userTopic.getLesson_completed() < topic.getTotalLessons()) {
+                userTopic.setLesson_completed(userTopic.getLesson_completed() + 1);
+                userTopicRepository.save(userTopic);
+            }
+            else{
+                logger.info("User {} has already completed all lessons in topic {}", userId, topic.getId());
+            }
+        }
+        else{
+            UserTopic userTopic = UserTopic
+                    .builder()
+                    .id(userTopicId)
+                    .user(user)
+                    .topic(topic)
+                    .lesson_completed(1)
+                    .build();
+            userTopicRepository.save(userTopic);
+        }
     }
 }

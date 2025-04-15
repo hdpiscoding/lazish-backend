@@ -2,13 +2,12 @@ package com.lazish.controller;
 
 import com.lazish.base.BaseController;
 import com.lazish.dto.ExerciseDTO;
-import com.lazish.service.implementations.ExerciseServiceImpl;
+import com.lazish.service.interfaces.ExerciseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -17,7 +16,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/exercises")
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 public class ExerciseController extends BaseController {
-    private final ExerciseServiceImpl exerciseService;
+    private final ExerciseService exerciseService;
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}")

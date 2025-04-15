@@ -5,6 +5,8 @@ import com.lazish.dto.LessonDTO;
 import com.lazish.dto.TopicDTO;
 import com.lazish.service.implementations.LessonServiceImpl;
 import com.lazish.service.implementations.TopicServiceImpl;
+import com.lazish.service.interfaces.LessonService;
+import com.lazish.service.interfaces.TopicService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,8 +20,8 @@ import java.util.UUID;
 @RequestMapping("/api/v1/topics")
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 public class TopicController extends BaseController {
-    private final TopicServiceImpl topicService;
-    private final LessonServiceImpl lessonService;
+    private final TopicService topicService;
+    private final LessonService lessonService;
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("")

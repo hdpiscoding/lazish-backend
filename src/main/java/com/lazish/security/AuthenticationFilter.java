@@ -1,7 +1,7 @@
 package com.lazish.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lazish.service.implementations.JwtServiceImpl;
+import com.lazish.service.interfaces.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,7 +13,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -25,7 +24,7 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class AuthenticationFilter extends OncePerRequestFilter {
-    private final JwtServiceImpl jwtService;
+    private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
     @Override

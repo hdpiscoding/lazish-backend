@@ -9,6 +9,7 @@ import com.lazish.mapper.ReelMapper;
 import com.lazish.repository.LikedReelRepository;
 import com.lazish.repository.ReelRepository;
 import com.lazish.repository.SavedReelRepository;
+import com.lazish.repository.UserRepository;
 import com.lazish.service.interfaces.ReelService;
 import com.lazish.utils.key.UserReelId;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,6 +28,7 @@ public class ReelServiceImpl implements ReelService {
     private final ReelMapper reelMapper;
     private final SavedReelRepository savedReelRepository;
     private final LikedReelRepository likedReelRepository;
+    private final UserRepository userRepository;
     @Override
     public List<ReelDTO> getAllReels() {
         return reelMapper.toDtoList(reelRepository.findAll());
@@ -40,27 +42,46 @@ public class ReelServiceImpl implements ReelService {
     @Override
     @Transactional
     public void likeReel(UUID userId, UUID reelId) {
-        LikedReel likedReel = LikedReel
-                .builder()
-                .id(new UserReelId(userId, reelId))
-                .build();
-        likedReelRepository.save(likedReel);
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found!"));
+        Reel reel = reelRepository.findById(reelId).orElseThrow(() -> new EntityNotFoundException("Reel not found!"));
+        if (!likedReelRepository.existsById(new UserReelId(userId, reelId))) {
+            LikedReel likedReel = LikedReel
+                    .builder()
+                    .id(new UserReelId(userId, reelId))
+                    .user(user)
+                    .reel(reel)
+                    .build();
+            likedReelRepository.save(likedReel);
+            reel.setLikes(reel.getLikes() + 1);
+            reelRepository.save(reel);
+        }
     }
 
     @Override
     @Transactional
     public void unlikeReel(UUID userId, UUID reelId) {
         likedReelRepository.deleteById(new UserReelId(userId, reelId));
+        Reel reel = reelRepository.findById(reelId).orElseThrow(() -> new EntityNotFoundException("Reel not found!"));
+        if (reel.getLikes() > 0) {
+            reel.setLikes(reel.getLikes() - 1);
+            reelRepository.save(reel);
+        }
     }
 
     @Override
     @Transactional
     public void saveReel(UUID userId, UUID reelId) {
-        SavedReel savedReel = SavedReel
-                .builder()
-                .id(new UserReelId(userId, reelId))
-                .build();
-        savedReelRepository.save(savedReel);
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found!"));
+        Reel reel = reelRepository.findById(reelId).orElseThrow(() -> new EntityNotFoundException("Reel not found!"));
+        if (!savedReelRepository.existsById(new UserReelId(userId, reelId))) {
+            SavedReel savedReel = SavedReel
+                    .builder()
+                    .id(new UserReelId(userId, reelId))
+                    .reel(reel)
+                    .user(user)
+                    .build();
+            savedReelRepository.save(savedReel);
+        }
     }
 
     @Override
