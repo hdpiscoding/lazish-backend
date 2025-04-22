@@ -30,8 +30,8 @@ public class TopicController extends BaseController {
     }
 
     @GetMapping("")
-    public ResponseEntity<Object> getAllTopics() {
-        return buildResponse(topicService.getAllTopics(), HttpStatus.OK, "Get all topics successfully");
+    public ResponseEntity<Object> getAllTopics(@RequestParam int page,@RequestParam int limit) {
+        return buildResponse(topicService.getAllTopics(page, limit), HttpStatus.OK, "Get all topics successfully");
     }
 
     @GetMapping("/{id}")

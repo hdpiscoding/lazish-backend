@@ -47,8 +47,8 @@ public class ReelController extends BaseController {
     }
 
     @GetMapping("")
-    public ResponseEntity<Object> getAllReels() {
-        return buildResponse(reelService.getAllReels(), HttpStatus.OK, "Get all reels successfully");
+    public ResponseEntity<Object> getAllReels(@RequestParam int page, @RequestParam int limit) {
+        return buildResponse(reelService.getAllReels(page, limit), HttpStatus.OK, "Get all reels successfully");
     }
 
     @GetMapping("/{id}")
@@ -58,9 +58,9 @@ public class ReelController extends BaseController {
 
     @PreAuthorize("hasAuthority('USER')")
     @GetMapping("/me/saved")
-    public ResponseEntity<Object> getMySavedReels(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<Object> getMySavedReels(@RequestHeader("Authorization") String authHeader, @RequestParam int page, @RequestParam int limit) {
         UUID userId = jwtService.extractUserId(authHeader.substring(7));
-        return buildResponse(reelService.getMySavedReels(userId), HttpStatus.OK, "Get my saved reels successfully");
+        return buildResponse(reelService.getMySavedReels(userId, page, limit), HttpStatus.OK, "Get my saved reels successfully");
     }
 
     @PostMapping("/{id}/likes")

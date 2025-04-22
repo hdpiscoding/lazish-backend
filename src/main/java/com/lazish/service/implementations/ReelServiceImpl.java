@@ -1,5 +1,6 @@
 package com.lazish.service.implementations;
 
+import com.lazish.dto.PaginatedResponseDTO;
 import com.lazish.dto.ReelDTO;
 import com.lazish.entity.LikedReel;
 import com.lazish.entity.Reel;
@@ -15,6 +16,8 @@ import com.lazish.utils.key.UserReelId;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,9 +32,20 @@ public class ReelServiceImpl implements ReelService {
     private final SavedReelRepository savedReelRepository;
     private final LikedReelRepository likedReelRepository;
     private final UserRepository userRepository;
+
     @Override
-    public List<ReelDTO> getAllReels() {
-        return reelMapper.toDtoList(reelRepository.findAll());
+    public PaginatedResponseDTO<ReelDTO> getAllReels(int page, int limit) {
+        PageRequest pageRequest = PageRequest.of(page - 1, limit);
+        Page<Reel> reels = reelRepository.findAll(pageRequest);
+        List<ReelDTO> reelDTOs = reelMapper.toDtoList(reels.getContent());
+        return new PaginatedResponseDTO<>(
+                reelDTOs,
+                reels.getNumber() + 1,
+                reels.getTotalPages(),
+                reels.getTotalElements(),
+                reels.getSize(),
+                reels.isLast()
+        );
     }
 
     @Override
@@ -98,8 +112,18 @@ public class ReelServiceImpl implements ReelService {
     }
 
     @Override
-    public List<ReelDTO> getMySavedReels(UUID userId) {
-        return reelMapper.toDtoList(savedReelRepository.getAllSavedReels(userId));
+    public PaginatedResponseDTO<ReelDTO> getMySavedReels(UUID userId, int page, int limit) {
+        PageRequest pageRequest = PageRequest.of(page - 1, limit);
+        Page<Reel> savedReels = savedReelRepository.getAllSavedReels(userId, pageRequest);
+        List<ReelDTO> reelDTOs = reelMapper.toDtoList(savedReels.getContent());
+        return new PaginatedResponseDTO<>(
+                reelDTOs,
+                savedReels.getNumber() + 1,
+                savedReels.getTotalPages(),
+                savedReels.getTotalElements(),
+                savedReels.getSize(),
+                savedReels.isLast()
+        );
     }
 
     @Override

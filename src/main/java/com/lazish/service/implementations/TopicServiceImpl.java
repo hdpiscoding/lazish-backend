@@ -1,5 +1,6 @@
 package com.lazish.service.implementations;
 
+import com.lazish.dto.PaginatedResponseDTO;
 import com.lazish.dto.TopicDTO;
 import com.lazish.entity.Lesson;
 import com.lazish.entity.Topic;
@@ -19,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,14 +56,23 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
-    public List<TopicDTO> getAllTopics() {
-        List<Topic> topics = topicRepository.findAll();
-        return topicMapper.toDtoList(topics
+    public PaginatedResponseDTO<TopicDTO> getAllTopics(int page, int limit) {
+        PageRequest pageRequest = PageRequest.of(page - 1, limit);
+        Page<Topic> topics = topicRepository.findAll(pageRequest);
+        List<TopicDTO> topicDTOs = topicMapper.toDtoList(topics.getContent()
                 .stream()
                 .peek(topic -> {
                     topic.setLessons(null);
                 })
                 .collect(Collectors.toList()));
+        return new PaginatedResponseDTO<>(
+                topicDTOs,
+                topics.getNumber() + 1,
+                topics.getSize(),
+                topics.getTotalElements(),
+                topics.getTotalPages(),
+                topics.isLast()
+        );
     }
 
     @Override
