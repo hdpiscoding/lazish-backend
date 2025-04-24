@@ -17,6 +17,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByEmail(String email);
     @Query("SELECT u.diamond FROM User u WHERE u.id = :userId")
     long getUserDiamonds(@PathVariable UUID userId);
-    @Query("SELECT u FROM User u ORDER BY u.diamond DESC")
+    @Query("SELECT u FROM User u WHERE u.role = 'USER' ORDER BY u.diamond DESC")
     Page<User> findAllUsersRank(Pageable pageable);
 }
