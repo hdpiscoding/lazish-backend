@@ -58,4 +58,10 @@ public class UserController extends BaseController {
         userService.changePassword(userId, body.get("password"));
         return buildResponse(null, HttpStatus.OK, "Change password successfully");
     }
+
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    @GetMapping("/ranking")
+    public ResponseEntity<Object> getRanking(@RequestParam int page, @RequestParam int limit) {
+        return buildResponse(userService.getUsersRank(page, limit), HttpStatus.OK, "Get all users' ranking successfully");
+    }
 }

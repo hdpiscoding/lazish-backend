@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0.40-debian
+    container_name: lazish-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: hdp
+      MYSQL_DATABASE: lazish
+      MYSQL_USER: hdp
+      MYSQL_PASSWORD: hdp
+    volumes:
+      - mysql-data:/var/lib/mysql
+  redis:
+    image: redis:latest
+    container_name: lazish-redis
+    ports:
+      - "6379:6379"
+volumes:
+  mysql-data:
