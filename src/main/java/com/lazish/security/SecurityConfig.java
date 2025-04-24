@@ -43,6 +43,7 @@ public class SecurityConfig {
 
                         // Admin APIs
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/{id}").hasAuthority("ADMIN")
+                        .requestMatchers("/api/v1/media/**").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/{id}/analysis").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/lessons").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/lessons/{id}").hasAuthority("ADMIN")
