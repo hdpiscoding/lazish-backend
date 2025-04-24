@@ -30,4 +30,15 @@ public class AuthController extends BaseController {
         AuthResponseDTO response = authService.login(request);
         return buildResponse(response, HttpStatus.OK, "User logged in successfully");
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Object> forgotPassword(@RequestBody String email) {
+        authService.forgotPassword(email);
+        return buildResponse(null, HttpStatus.OK, "Password reset link sent to your email");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Object> resetPassword(@RequestBody String otp, @RequestBody String email, @RequestBody String newPassword) {
+        return buildResponse(authService.resetPassword(otp, email, newPassword), HttpStatus.OK, "Password reset successfully");
+    }
 }

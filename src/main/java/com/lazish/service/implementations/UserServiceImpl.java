@@ -1,5 +1,6 @@
 package com.lazish.service.implementations;
 
+import com.lazish.dto.PaginatedResponseDTO;
 import com.lazish.dto.UserDTO;
 import com.lazish.entity.User;
 import com.lazish.mapper.UserMapper;
@@ -9,6 +10,8 @@ import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -104,5 +107,25 @@ public class UserServiceImpl implements UserService {
     @Override
     public long getUserDiamonds(UUID userId) {
         return userRepository.getUserDiamonds(userId);
+    }
+
+    @Override
+    public PaginatedResponseDTO<UserDTO> getUsersRank(int page, int limit) {
+        PageRequest pageRequest = PageRequest.of(page - 1, limit);
+        Page<User> users = userRepository.findAllUsersRank(pageRequest);
+        List<UserDTO> userDTOs = userMapper.toDtoList(users.getContent()
+                .stream()
+                .peek(user -> {
+                    user.setReels(null);
+                })
+                .collect(Collectors.toList()));
+        return new PaginatedResponseDTO<>(
+                userDTOs,
+                users.getNumber() + 1,
+                users.getSize(),
+                users.getTotalElements(),
+                users.getTotalPages(),
+                users.isLast()
+        );
     }
 }

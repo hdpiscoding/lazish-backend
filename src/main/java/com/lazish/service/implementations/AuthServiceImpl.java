@@ -5,11 +5,15 @@ import com.lazish.dto.LoginDTO;
 import com.lazish.dto.RegisterDTO;
 import com.lazish.dto.UserDTO;
 import com.lazish.entity.User;
+import com.lazish.exception.TooManyRequestsException;
 import com.lazish.mapper.UserMapper;
 import com.lazish.repository.UserRepository;
 import com.lazish.service.interfaces.AuthService;
+import com.lazish.service.interfaces.EmailService;
 import com.lazish.service.interfaces.JwtService;
+import com.lazish.service.interfaces.OTPService;
 import com.lazish.utils.enums.Role;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +29,8 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final EmailService emailService;
+    private final OTPService otpService;
 
 
     @Override
@@ -63,9 +69,34 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void forgotPassword(String newPassword) {
-        return;
+    public void forgotPassword(String email) {
+        try {
+            if (!userRepository.existsByEmail(email)) {
+                return;
+            }
+            if (!otpService.canSendOTP(email)){
+                throw new TooManyRequestsException("Too many requests. Please try again later.");
+            }
+            String otp = emailService.generateOTP();
+            otpService.saveOTP(email, otp);
+            emailService.sendOTPEmail(email, otp);
+        }
+        catch (MessagingException e)
+        {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
-
+    @Override
+    public UserDTO resetPassword(String otp, String email, String newPassword) {
+        boolean isValid = otpService.verifyOTP(email, otp);
+        if (!isValid) {
+            throw new RuntimeException("Invalid OTP");
+        }
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return userMapper.toDto(user);
+    }
 }

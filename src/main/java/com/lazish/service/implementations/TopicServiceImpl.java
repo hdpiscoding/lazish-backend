@@ -142,4 +142,12 @@ public class TopicServiceImpl implements TopicService {
             userTopicRepository.save(userTopic);
         }
     }
+
+    @Override
+    public int getUserProgress(UUID userId, UUID topicId) {
+        if(userTopicRepository.existsById(new UserTopicId(userId, topicId))) {
+            return userTopicRepository.getUserProgressByTopic(userId, topicId);
+        }
+        return 0;
+    }
 }

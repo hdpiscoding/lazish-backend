@@ -13,4 +13,5 @@ public interface TopicService {
     TopicDTO updateTopic(UUID id, TopicDTO topicDTO);
     void deleteTopic(UUID id);
     void finishUserTopic(UUID userId, UUID lessonId);
+    int getUserProgress(UUID userId, UUID topicId);
 }

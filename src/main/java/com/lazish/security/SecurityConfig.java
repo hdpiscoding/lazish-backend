@@ -39,6 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/users/me/**").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers("/api/v1/rank").hasAuthority("USER")
                         .requestMatchers(HttpMethod.GET, "/api/v1/reels/{id}").hasAuthority("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/topics/{id}/me").hasAuthority("USER")
 
                         // Admin APIs
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/{id}").hasAuthority("ADMIN")

@@ -14,5 +14,5 @@ import java.util.UUID;
 @Repository
 public interface UserTopicRepository extends JpaRepository<UserTopic, UserTopicId> {
     @Query("SELECT u.lesson_completed FROM UserTopic u WHERE u.user.id = :userId AND u.topic.id = :topicId")
-    List<UserTopic> getUserProgressByTopic(@Param("userId") UUID userId, @Param("topicId") UUID topicId);
+    int getUserProgressByTopic(@Param("userId") UUID userId, @Param("topicId") UUID topicId);
 }
