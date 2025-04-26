@@ -37,7 +37,7 @@ public class EmailServiceImpl implements EmailService {
                     "<p>OTP: <b>" + otp + "</b></p>" +
                     "<p>This OTP will expire in 5 minutes.</p>";
             helper.setText(htmlContent, true);
-
+            logger.info("Sending OTP verification email...");
             mailSender.send(mimeMessage);
         }
         catch(Exception e){

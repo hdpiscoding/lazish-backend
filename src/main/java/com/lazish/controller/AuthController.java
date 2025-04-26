@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -32,13 +34,13 @@ public class AuthController extends BaseController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<Object> forgotPassword(@RequestBody String email) {
-        authService.forgotPassword(email);
+    public ResponseEntity<Object> forgotPassword(@RequestBody Map<String, String> body) {
+        authService.forgotPassword(body.get("email"));
         return buildResponse(null, HttpStatus.OK, "Password reset link sent to your email");
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<Object> resetPassword(@RequestBody String otp, @RequestBody String email, @RequestBody String newPassword) {
-        return buildResponse(authService.resetPassword(otp, email, newPassword), HttpStatus.OK, "Password reset successfully");
+    public ResponseEntity<Object> resetPassword(@RequestBody Map<String, String> body) {
+        return buildResponse(authService.resetPassword(body.get("otp"), body.get("email"), body.get("newPassword")), HttpStatus.OK, "Password reset successfully");
     }
 }

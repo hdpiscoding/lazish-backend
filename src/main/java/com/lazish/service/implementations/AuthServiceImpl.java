@@ -15,6 +15,8 @@ import com.lazish.service.interfaces.OTPService;
 import com.lazish.utils.enums.Role;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,6 +33,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
     private final OTPService otpService;
+    private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
 
 
     @Override
@@ -72,7 +75,7 @@ public class AuthServiceImpl implements AuthService {
     public void forgotPassword(String email) {
         try {
             if (!userRepository.existsByEmail(email)) {
-                return;
+                throw new RuntimeException("User not found");
             }
             if (!otpService.canSendOTP(email)){
                 throw new TooManyRequestsException("Too many requests. Please try again later.");
