@@ -5,6 +5,7 @@ import com.lazish.dto.LoginDTO;
 import com.lazish.dto.RegisterDTO;
 import com.lazish.dto.UserDTO;
 import com.lazish.entity.User;
+import com.lazish.exception.InvalidOTPException;
 import com.lazish.exception.TooManyRequestsException;
 import com.lazish.mapper.UserMapper;
 import com.lazish.repository.UserRepository;
@@ -94,7 +95,7 @@ public class AuthServiceImpl implements AuthService {
     public UserDTO resetPassword(String otp, String email, String newPassword) {
         boolean isValid = otpService.verifyOTP(email, otp);
         if (!isValid) {
-            throw new RuntimeException("Invalid OTP");
+            throw new InvalidOTPException("OTP is invalid or expired. Please try again.");
         }
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));

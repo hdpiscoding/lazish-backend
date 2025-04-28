@@ -1,44 +1,53 @@
 package com.lazish.service.implementations;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import com.lazish.service.interfaces.OTPService;
-import com.lazish.utils.constants.RedisConstants;
+import com.lazish.utils.constants.OTPConstants;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.TimeUnit;
-
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class OTPServiceImpl implements OTPService {
-    private final RedisTemplate<String, String> redisTemplate;
+    private final Cache<String, String> otpCache;
+    private final Cache<String, Integer> attemptCache;
+    private static final Logger logger = LoggerFactory.getLogger(OTPServiceImpl.class);
 
     @Override
     public void saveOTP(String email, String otp) {
-        redisTemplate.opsForValue().set(email, otp, RedisConstants.OTP_EXPIRY_MINUTES, TimeUnit.MINUTES);
-        String attempKey = "otp:attempt:" + email;
-        redisTemplate.opsForValue().increment(attempKey);
-        redisTemplate.expire(attempKey, 1, TimeUnit.HOURS);
+        otpCache.put(email, otp);
+        attemptCache.asMap().merge(email + ":attempts", 1, (Integer::sum));
+        logger.info("Saved OTP for email: {}", email);
     }
 
     @Override
     public boolean verifyOTP(String email, String otp) {
-        String storedOtp = redisTemplate.opsForValue().get(email);
+        String storedOtp = otpCache.getIfPresent(email);
         if (storedOtp == null) {
+            logger.info("OTP for email: {}", email + " not found");
             return false;
         }
         boolean isValid = storedOtp.equals(otp);
         if (isValid) {
-            redisTemplate.delete(email);
+            otpCache.invalidate(email);
+            logger.info("OTP for email: {}", email + " validated");
         }
         return isValid;
     }
 
     @Override
     public boolean canSendOTP(String email) {
-        String attemptKey = "otp:attempt:" + email;
-        String attempts = redisTemplate.opsForValue().get(attemptKey);
-        return attempts == null || Integer.parseInt(attempts) <= RedisConstants.MAX_ATTEMPTS;
+        Integer attempts = attemptCache.getIfPresent(email + ":attempts");
+        if (attempts == null) {
+            attemptCache.put(email + ":attempts", 1);
+            return true;
+        }
+        if (attempts >= OTPConstants.MAX_ATTEMPTS) {
+            logger.warn("Attempt limit reached. Attempt count: {}", attempts);
+            return false;
+        }
+        return true;
     }
 }
