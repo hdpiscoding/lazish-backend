@@ -1,10 +1,10 @@
 package com.lazish.utils.constants;
 
-public class RedisConstants {
+public class OTPConstants {
     public static final long OTP_EXPIRY_MINUTES = 5;
     public static final int MAX_ATTEMPTS = 5;
 
-    private RedisConstants() {
+    private OTPConstants() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 }
