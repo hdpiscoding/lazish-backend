@@ -32,9 +32,9 @@ public class Lesson extends BaseEntity {
     @Column(name = "reward", nullable = false)
     private int reward;
 
-    @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<UserLesson> userLessons = new HashSet<>();
 
-    @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "lesson", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Exercise> exercises = new HashSet<>();
 }

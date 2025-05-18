@@ -35,9 +35,9 @@ public class Reel extends BaseEntity {
     @Column(name = "likes", nullable = false)
     private long likes = 0;
 
-    @OneToMany(mappedBy = "reel", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "reel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<LikedReel> likedReels = new HashSet<>();
 
-    @OneToMany(mappedBy = "reel", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "reel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<SavedReel> savedReels = new HashSet<>();
 }
