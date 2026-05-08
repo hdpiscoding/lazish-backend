@@ -1,5 +1,8 @@
 package com.lazish.exception;
 
+import com.lazish.auth.exception.InvalidRefreshToken;
+import com.lazish.auth.exception.RefreshTokenIsExpired;
+import com.lazish.auth.exception.RefreshTokenIsRevoked;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.exception.ConstraintViolationException;
@@ -65,6 +68,27 @@ public class GlobalExceptionHandler {
         logger.error("Too many requests: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.TOO_MANY_REQUESTS.value(), "Too many requests", ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorResponse, HttpStatus.TOO_MANY_REQUESTS);
+    }
+
+    @ExceptionHandler(RefreshTokenIsRevoked.class)
+    public ResponseEntity<ErrorResponse> handleRefreshTokenIsRevoked(RefreshTokenIsRevoked ex, WebRequest request) {
+        logger.error("Refresh token is expired: {}", ex.getMessage(), ex);
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Refresh token has been revoked", ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(RefreshTokenIsExpired.class)
+    public ResponseEntity<ErrorResponse> handleRefreshTokenIsExpired(RefreshTokenIsExpired ex, WebRequest request) {
+        logger.error("Refresh token has expired: {}", ex.getMessage(), ex);
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Refresh token has expired", ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(InvalidRefreshToken.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRefreshToken(InvalidRefreshToken ex, WebRequest request) {
+        logger.error("Invalid refresh token: {}", ex.getMessage(), ex);
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Invalid refresh token", ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

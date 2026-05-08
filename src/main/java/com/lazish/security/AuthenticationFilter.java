@@ -1,7 +1,6 @@
 package com.lazish.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lazish.service.interfaces.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

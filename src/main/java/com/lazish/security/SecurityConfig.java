@@ -1,6 +1,6 @@
 package com.lazish.security;
 
-import com.lazish.repository.UserRepository;
+import com.lazish.user.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +33,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public APIs
                         .requestMatchers("/error").permitAll()
+
+                        //Auth APIs
+                        .requestMatchers("/api/v1/auth/logout").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
 
                         // User APIs
