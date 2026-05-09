@@ -1,4 +1,4 @@
-package com.lazish.quiz.exercise;
+package com.lazish.quiz.exercise.core;
 
 import com.lazish.common.base.BaseMapper;
 import lombok.RequiredArgsConstructor;

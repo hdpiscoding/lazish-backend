@@ -1,13 +1,13 @@
 package com.lazish.quiz.lesson;
 
-import com.lazish.quiz.exercise.Exercise;
+import com.lazish.quiz.exercise.core.Exercise;
 import com.lazish.quiz.topic.Topic;
 import com.lazish.quiz.topic.TopicRepository;
 import com.lazish.user.User;
 import com.lazish.quiz.progress.UserLesson;
 import com.lazish.quiz.progress.UserLessonRepository;
 import com.lazish.user.UserRepository;
-import com.lazish.quiz.exercise.ExerciseService;
+import com.lazish.quiz.exercise.core.ExerciseService;
 import com.lazish.quiz.topic.TopicService;
 import com.lazish.common.utils.key.UserLessonId;
 import jakarta.persistence.EntityNotFoundException;

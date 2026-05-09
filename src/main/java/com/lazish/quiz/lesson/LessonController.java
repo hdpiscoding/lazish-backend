@@ -1,8 +1,8 @@
 package com.lazish.quiz.lesson;
 
 import com.lazish.common.base.BaseController;
-import com.lazish.quiz.exercise.ExerciseDTO;
-import com.lazish.quiz.exercise.ExerciseService;
+import com.lazish.quiz.exercise.core.ExerciseDTO;
+import com.lazish.quiz.exercise.core.ExerciseService;
 import com.lazish.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

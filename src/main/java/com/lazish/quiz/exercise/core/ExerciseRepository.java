@@ -1,4 +1,4 @@
-package com.lazish.quiz.exercise;
+package com.lazish.quiz.exercise.core;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

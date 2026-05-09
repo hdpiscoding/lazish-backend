@@ -1,7 +1,7 @@
 package com.lazish.quiz.lesson;
 
 import com.lazish.common.base.BaseEntity;
-import com.lazish.quiz.exercise.Exercise;
+import com.lazish.quiz.exercise.core.Exercise;
 import com.lazish.quiz.topic.Topic;
 import com.lazish.quiz.progress.UserLesson;
 import jakarta.persistence.*;

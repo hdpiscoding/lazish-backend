@@ -1,6 +1,6 @@
 package com.lazish.quiz.lesson;
 
-import com.lazish.quiz.exercise.ExerciseDTO;
+import com.lazish.quiz.exercise.core.ExerciseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
