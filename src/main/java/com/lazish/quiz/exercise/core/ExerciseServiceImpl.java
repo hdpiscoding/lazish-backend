@@ -1,5 +1,6 @@
 package com.lazish.quiz.exercise.core;
 
+import com.lazish.common.aop.annotations.Audit;
 import com.lazish.quiz.exercise.core.strategy.ExerciseStrategy;
 import com.lazish.quiz.exercise.core.strategy.ExerciseStrategyFactory;
 import com.lazish.quiz.lesson.Lesson;
@@ -26,6 +27,7 @@ public class ExerciseServiceImpl implements ExerciseService {
 
     @Override
     @Transactional
+    @Audit(action = "CREATE", entity = "EXERCISE")
     public Exercise createExercise(ExerciseDTO exerciseDTO, Lesson lesson) {
         ExerciseType exerciseType = parseExerciseType(exerciseDTO.getExerciseType());
         ExerciseStrategy strategy = exerciseStrategyFactory.getStrategy(exerciseType);
@@ -35,6 +37,7 @@ public class ExerciseServiceImpl implements ExerciseService {
 
     @Override
     @Transactional
+    @Audit(action = "UPDATE", entity = "EXERCISE", entityIdParam = "id")
     public ExerciseDTO updateExercise(UUID id, ExerciseDTO exerciseDTO) {
         Exercise exercise = exerciseRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Exercise not found!"));
@@ -52,6 +55,7 @@ public class ExerciseServiceImpl implements ExerciseService {
 
     @Override
     @Transactional
+    @Audit(action = "DELETE", entity = "EXERCISE", entityIdParam = "id")
     public void deleteExercise(UUID id) {
         exerciseRepository.deleteById(id);
     }
@@ -60,8 +64,6 @@ public class ExerciseServiceImpl implements ExerciseService {
     @Transactional
     public ExerciseDTO addExerciseToLesson(ExerciseDTO exerciseDTO, UUID lessonId) {
         Lesson lesson = lessonRepository.findById(lessonId).orElseThrow(() -> new EntityNotFoundException("Lesson not found!"));
-
-        // Make sure @Transactional works correctly
         ExerciseServiceImpl self = applicationContext.getBean(ExerciseServiceImpl.class);
         Exercise exercise = self.createExercise(exerciseDTO, lesson);
         return exerciseMapper.toDto(exercise);

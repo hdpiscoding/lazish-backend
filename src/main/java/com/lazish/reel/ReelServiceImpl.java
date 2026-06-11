@@ -1,5 +1,6 @@
 package com.lazish.reel;
 
+import com.lazish.common.aop.annotations.Audit;
 import com.lazish.common.dto.PaginatedResponseDTO;
 import com.lazish.user.User;
 import com.lazish.user.UserRepository;
@@ -46,6 +47,7 @@ public class ReelServiceImpl implements ReelService {
 
     @Override
     @Transactional
+    @Audit(action = "CREATE", entity = "LIKED_REEL")
     public void likeReel(UUID userId, UUID reelId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found!"));
         Reel reel = reelRepository.findById(reelId).orElseThrow(() -> new EntityNotFoundException("Reel not found!"));
@@ -64,6 +66,7 @@ public class ReelServiceImpl implements ReelService {
 
     @Override
     @Transactional
+    @Audit(action = "DELETE", entity = "LIKED_REEL")
     public void unlikeReel(UUID userId, UUID reelId) {
         likedReelRepository.deleteById(new UserReelId(userId, reelId));
         Reel reel = reelRepository.findById(reelId).orElseThrow(() -> new EntityNotFoundException("Reel not found!"));
@@ -75,6 +78,7 @@ public class ReelServiceImpl implements ReelService {
 
     @Override
     @Transactional
+    @Audit(action = "CREATE", entity = "SAVED_REEL")
     public void saveReel(UUID userId, UUID reelId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found!"));
         Reel reel = reelRepository.findById(reelId).orElseThrow(() -> new EntityNotFoundException("Reel not found!"));
@@ -91,12 +95,14 @@ public class ReelServiceImpl implements ReelService {
 
     @Override
     @Transactional
+    @Audit(action = "DELETE", entity = "SAVED_REEL")
     public void unsaveReel(UUID userId, UUID reelId) {
         savedReelRepository.deleteById(new UserReelId(userId, reelId));
     }
 
     @Override
     @Transactional
+    @Audit(action = "DELETE", entity = "REEL", entityIdParam = "id")
     public void deleteReel(UUID id) {
         Reel reel = reelRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Reel not found!"));
         reelRepository.delete(reel);
@@ -119,6 +125,7 @@ public class ReelServiceImpl implements ReelService {
 
     @Override
     @Transactional
+    @Audit(action = "CREATE", entity = "REEL")
     public ReelDTO createReel(User user, ReelDTO reelDTO) {
         Reel reel = Reel
                 .builder()
@@ -131,6 +138,7 @@ public class ReelServiceImpl implements ReelService {
 
     @Override
     @Transactional
+    @Audit(action = "UPDATE", entity = "REEL", entityIdParam = "id")
     public ReelDTO updateReel(UUID id, ReelDTO reelDTO) {
         Reel reel = reelRepository.findById(id).orElseThrow(() -> new RuntimeException("Reel not found"));
         if (reelDTO.getCaption() != null) {

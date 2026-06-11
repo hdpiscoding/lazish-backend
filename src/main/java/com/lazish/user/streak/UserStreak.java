@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -26,9 +26,12 @@ public class UserStreak extends BaseEntity {
     @JoinColumn(name = "user", nullable = false, unique = true)
     private User user;
 
-    @Column(name = "streak")
-    private int streak = 0;
+    @Column(name = "current_streak", nullable = false)
+    private int currentStreak = 0;
 
-    @Column(name = "last_login")
-    private LocalDateTime last_login = LocalDateTime.now();
+    @Column(name = "longest_streak", nullable = false)
+    private int longestStreak = 0;
+
+    @Column(name = "last_activity_date")
+    private LocalDate lastActivityDate;
 }

@@ -1,5 +1,6 @@
 package com.lazish.quiz.lesson;
 
+import com.lazish.common.aop.annotations.Audit;
 import com.lazish.quiz.exercise.core.Exercise;
 import com.lazish.quiz.topic.Topic;
 import com.lazish.quiz.topic.TopicRepository;
@@ -36,6 +37,7 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     @Transactional
+    @Audit(action = "CREATE", entity = "LESSON")
     public Lesson createLesson(LessonDTO lessonDTO, Topic topic) {
         Lesson lesson = lessonRepository.save(Lesson
                 .builder()
@@ -54,6 +56,7 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     @Transactional
+    @Audit(action = "UPDATE", entity = "LESSON", entityIdParam = "id")
     public LessonDTO updateLesson(UUID id, LessonDTO lessonDTO) {
         Lesson lesson = lessonRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Lesson not found!"));
         logger.info("Updating lesson reward:{}", lessonDTO.getReward());
@@ -65,6 +68,7 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     @Transactional
+    @Audit(action = "CREATE", entity = "LESSON", entityIdParam = "topicId")
     public LessonDTO addLessonToTopic(LessonDTO lessonDTO, UUID topicId) {
         Topic topic = topicRepository.findById(topicId).orElseThrow(() -> new EntityNotFoundException("Topic not found!"));
         Lesson lesson = lessonRepository.save(Lesson
@@ -85,6 +89,7 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     @Transactional
+    @Audit(action = "DELETE", entity = "LESSON", entityIdParam = "id")
     public void deleteLesson(UUID id) {
         Lesson lesson = lessonRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Lesson not found!"));
         Topic topic = lessonRepository.getTopicByLessonId(id);

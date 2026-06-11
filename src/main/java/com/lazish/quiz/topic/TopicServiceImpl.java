@@ -1,5 +1,6 @@
 package com.lazish.quiz.topic;
 
+import com.lazish.common.aop.annotations.Audit;
 import com.lazish.common.dto.PaginatedResponseDTO;
 import com.lazish.quiz.lesson.Lesson;
 import com.lazish.user.User;
@@ -71,6 +72,7 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     @Transactional
+    @Audit(action = "CREATE", entity = "TOPIC")
     public TopicDTO createTopic(TopicDTO topicDTO) {
         Topic topic = topicRepository.save(Topic
                 .builder()
@@ -91,6 +93,7 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     @Transactional
+    @Audit(action = "UPDATE", entity = "TOPIC", entityIdParam = "id")
     public TopicDTO updateTopic(UUID id, TopicDTO topicDTO) {
         Topic topic = topicRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Topic not found!"));
         if(topicDTO.getName() != null) {
@@ -104,6 +107,7 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     @Transactional
+    @Audit(action = "DELETE", entity = "TOPIC", entityIdParam = "id")
     public void deleteTopic(UUID id) {
         topicRepository.deleteById(id);
     }

@@ -6,7 +6,6 @@ import com.lazish.auth.dto.RegisterDTO;
 import com.lazish.auth.exception.InvalidRefreshToken;
 import com.lazish.auth.exception.RefreshTokenIsExpired;
 import com.lazish.auth.exception.RefreshTokenIsRevoked;
-import com.lazish.notification.EmailServiceImpl;
 import com.lazish.user.UserDTO;
 import com.lazish.user.User;
 import com.lazish.exception.TooManyRequestsException;
@@ -62,6 +61,7 @@ public class AuthServiceImpl implements AuthService {
         user.setAge(request.getAge());
         user.setRole(Role.USER);
         User newUser = userRepository.save(user);
+        logger.info("Register userId={} email={}", newUser.getId(), newUser.getEmail());
         String token = jwtService.generateToken(newUser);
         String refreshToken = issueRefreshToken(newUser);
         return AuthResponseDTO
@@ -81,6 +81,7 @@ public class AuthServiceImpl implements AuthService {
         );
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        logger.info("Login userId={} email={}", user.getId(), user.getEmail());
         String token = jwtService.generateToken(user);
         String refreshToken = issueRefreshToken(user);
         UserDTO userDTO = userMapper.toDto(user);
@@ -95,6 +96,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponseDTO refresh(String refreshToken) {
         RefreshToken storedToken = findValidRefreshToken(refreshToken);
+        logger.info("Refresh token userId={}", storedToken.getUser().getId());
         revokeToken(storedToken);
         String newAccessToken = jwtService.generateToken(storedToken.getUser());
         String newRefreshToken = issueRefreshToken(storedToken.getUser());
@@ -108,6 +110,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(String refreshToken) {
         RefreshToken storedToken = findValidRefreshToken(refreshToken);
+        logger.info("Logout userId={}", storedToken.getUser().getId());
         revokeToken(storedToken);
     }
 
