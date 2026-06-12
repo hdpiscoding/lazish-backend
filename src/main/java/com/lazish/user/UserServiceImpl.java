@@ -94,11 +94,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int getUserStreak(UUID userId) {
-        return 0;
-    }
-
-    @Override
     public long getUserDiamonds(UUID userId) {
         return userRepository.getUserDiamonds(userId);
     }

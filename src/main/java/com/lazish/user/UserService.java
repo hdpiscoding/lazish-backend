@@ -11,7 +11,6 @@ public interface UserService {
     void changePassword(UUID id, String newPassword);
     void deleteUser(UUID id);
     List<UserDTO> getAllUsers();
-    int getUserStreak(UUID userId);
     long getUserDiamonds(UUID userId);
     PaginatedResponseDTO<UserDTO> getUsersRank(int page, int limit);
 }

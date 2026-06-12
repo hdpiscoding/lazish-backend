@@ -2,6 +2,7 @@ package com.lazish.user;
 
 import com.lazish.common.base.BaseController;
 import com.lazish.security.JwtService;
+import com.lazish.user.streak.UserStreakRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor_ = {@Autowired})
 public class UserController extends BaseController {
     private final UserService userService;
+    private final UserStreakRepository userStreakRepository;
     private final JwtService jwtService;
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -58,5 +60,13 @@ public class UserController extends BaseController {
     @GetMapping("/ranking")
     public ResponseEntity<Object> getRanking(@RequestParam int page, @RequestParam int limit) {
         return buildResponse(userService.getUsersRank(page, limit), HttpStatus.OK, "Get all users' ranking successfully");
+    }
+
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    @GetMapping("/me/streak")
+    public ResponseEntity<Object> getStreak(@RequestHeader("Authorization") String authHeader) {
+        UUID userId = jwtService.extractUserId(authHeader.substring(7));
+        Map<String, Object> userStreak = Map.of("currentStreak", userStreakRepository.getUserStreak(userId), "longestStreak", userStreakRepository.getUserLongestStreak(userId));
+        return buildResponse(userStreak, HttpStatus.OK, "Get user streak successfully");
     }
 }

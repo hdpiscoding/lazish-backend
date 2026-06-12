@@ -13,6 +13,7 @@ import com.lazish.user.UserMapper;
 import com.lazish.notification.EmailService;
 import com.lazish.user.UserRepository;
 import com.lazish.security.JwtService;
+import com.lazish.user.streak.UserStreakService;
 import com.lazish.common.utils.enums.Role;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,7 @@ public class AuthServiceImpl implements AuthService {
     private final EmailService emailService;
     private final OTPService otpService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserStreakService userStreakService;
     private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
 
     @Value("${REFRESH_TOKEN_TTL_DAYS}")
@@ -62,6 +64,9 @@ public class AuthServiceImpl implements AuthService {
         user.setRole(Role.USER);
         User newUser = userRepository.save(user);
         logger.info("Register userId={} email={}", newUser.getId(), newUser.getEmail());
+        
+        userStreakService.updateLoginStreak(newUser);
+        
         String token = jwtService.generateToken(newUser);
         String refreshToken = issueRefreshToken(newUser);
         return AuthResponseDTO
@@ -82,6 +87,9 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         logger.info("Login userId={} email={}", user.getId(), user.getEmail());
+        
+        userStreakService.updateLoginStreak(user);
+        
         String token = jwtService.generateToken(user);
         String refreshToken = issueRefreshToken(user);
         UserDTO userDTO = userMapper.toDto(user);
